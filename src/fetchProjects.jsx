@@ -8,7 +8,7 @@ const client = createClient({
   accessToken: import.meta.env.VITE_ACCESS_TOKEN,
 });
 
-const useFetchProjects = () => {
+export const useFetchProjects = () => {
   const [loading, setLoading] = useState(true);
   const [projects, setProjects] = useState([]);
 
@@ -16,15 +16,13 @@ const useFetchProjects = () => {
     try {
       const response = await client.getEntries({ content_type: 'projects' });
       const projects = response.items.map((item) => {
-        const { title, url } = item.fields;
-        const { url: image } = item.fields.image.fields.file;
-        const { id } = item.sys;
+        const { title, url, image } = item.fields;
+        const img = image?.fields?.file.url;
+        const id = item.sys.id;
         console.log();
-        return { title, url, image, id };
+        return { title, url, img, id };
       });
-
-      console.log(projects);
-
+      setProjects(projects);
       setLoading(false);
     } catch (error) {
       console.log(error);
@@ -35,8 +33,9 @@ const useFetchProjects = () => {
   useEffect(() => {
     getData();
   }, []);
+
+  return { loading, projects };
 };
-export default useFetchProjects;
 
 // client
 //   .getEntries({ content_type: 'projects' })
